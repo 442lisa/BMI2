@@ -61,10 +61,25 @@
             {% if result %}
               <section class="result-panel {{ result.tone }}" aria-labelledby="result-title" aria-live="polite">
                 <span class="panel-kicker">YOUR RESULT / 計算結果</span>
-                <div class="result-main">
-                  <span class="result-number">{{ result.bmi }}</span>
-                  <span class="result-unit">BMI</span>
-                </div>
+                <figure class="gauge" role="img" aria-label="BMI 儀表板，你的 BMI 為 {{ result.bmi }}，屬於{{ result.label }}">
+                  <svg viewBox="0 0 200 112" aria-hidden="true">
+                    <path class="gauge-seg seg-low" d="M 20 100 A 80 80 0 0 1 49.65 37.83"/>
+                    <path class="gauge-seg seg-healthy" d="M 49.65 37.83 A 80 80 0 0 1 91.64 20.44"/>
+                    <path class="gauge-seg seg-high" d="M 91.64 20.44 A 80 80 0 0 1 116.63 21.75"/>
+                    <path class="gauge-seg seg-obese" d="M 116.63 21.75 A 80 80 0 0 1 180 100"/>
+                    <text class="gauge-tick" x="44" y="30">18.5</text>
+                    <text class="gauge-tick" x="94" y="12">24</text>
+                    <text class="gauge-tick" x="124" y="14">27</text>
+                    <g class="gauge-needle" style="transform: rotate({{ result.gauge_angle }}deg);">
+                      <path d="M 100 100 L 96 96 L 100 34 L 104 96 Z"/>
+                    </g>
+                    <circle class="gauge-hub" cx="100" cy="100" r="6"/>
+                  </svg>
+                  <figcaption class="result-main">
+                    <span class="result-number">{{ result.bmi }}</span>
+                    <span class="result-unit">BMI</span>
+                  </figcaption>
+                </figure>
                 <div class="result-divider"></div>
                 <span class="result-label">你的體位屬於 <strong>{{ result.label }}</strong></span>
                 <h2 id="result-title">給你的健康建議</h2>

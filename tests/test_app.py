@@ -1,6 +1,6 @@
 import unittest
 
-from app import app, bmi_guidance
+from app import app, bmi_guidance, gauge_angle
 
 
 class BmiAppTests(unittest.TestCase):
@@ -59,6 +59,19 @@ class BmiAppTests(unittest.TestCase):
                 page = response.get_data(as_text=True)
                 self.assertIn(f'class="result-panel {tone}"', page)
                 self.assertIn('class="result-number"', page)
+
+    def test_gauge_angle_mapping(self):
+        for bmi, angle in [(5, -90.0), (10, -90.0), (18.5, -39.0), (24, -6.0), (25, 0.0), (27, 12.0), (40, 90.0), (55, 90.0)]:
+            with self.subTest(bmi=bmi):
+                self.assertEqual(gauge_angle(bmi), angle)
+
+    def test_result_renders_gauge(self):
+        response = self.client.post("/", data={"height": "170", "weight": "65"})
+        page = response.get_data(as_text=True)
+        self.assertIn('class="gauge"', page)
+        self.assertIn('class="gauge-needle" style="transform: rotate(-15.0deg);"', page)
+        for segment in ["seg-low", "seg-healthy", "seg-high", "seg-obese"]:
+            self.assertIn(segment, page)
 
     def test_invalid_fields_do_not_produce_result(self):
         for height, weight in [("", "65"), ("0", "65"), ("abc", "65"), ("170", "-2"), ("inf", "65"), ("170", "nan"), ("1e-300", "65"), ("1e308", "65"), ("1", "1e308")]:
