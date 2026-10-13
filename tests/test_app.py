@@ -33,6 +33,33 @@ class BmiAppTests(unittest.TestCase):
             with self.subTest(bmi=bmi):
                 self.assertEqual(bmi_guidance(bmi)["label"], category)
 
+    def test_result_color_by_category(self):
+        with self.client.get("/static/style.css") as response:
+            self.assertEqual(response.status_code, 200)
+            stylesheet = response.get_data(as_text=True).replace("\r\n", "\n")
+        warning_rule = (
+            ".result-panel.low .result-number,\n"
+            ".result-panel.high .result-number,\n"
+            ".result-panel.low .result-label strong,\n"
+            ".result-panel.high .result-label strong { color: #b42318; }"
+        )
+        self.assertIn(warning_rule, stylesheet)
+        for weight, tone in [
+            ("18.4", "low"),
+            ("18.5", "healthy"),
+            ("23.9", "healthy"),
+            ("24.0", "high"),
+            ("26.9", "high"),
+            ("27.0", "high"),
+            ("18.46", "healthy"),
+            ("23.96", "high"),
+        ]:
+            with self.subTest(weight=weight):
+                response = self.client.post("/", data={"height": "100", "weight": weight})
+                page = response.get_data(as_text=True)
+                self.assertIn(f'class="result-panel {tone}"', page)
+                self.assertIn('class="result-number"', page)
+
     def test_invalid_fields_do_not_produce_result(self):
         for height, weight in [("", "65"), ("0", "65"), ("abc", "65"), ("170", "-2"), ("inf", "65"), ("170", "nan"), ("1e-300", "65"), ("1e308", "65"), ("1", "1e308")]:
             with self.subTest(height=height, weight=weight):
