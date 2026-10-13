@@ -31,6 +31,17 @@ def bmi_guidance(bmi):
     }
 
 
+GAUGE_MIN_BMI = 10
+GAUGE_MAX_BMI = 40
+
+
+def gauge_angle(bmi):
+    """Map a BMI value onto the half-circle gauge needle angle (-90° to 90°)."""
+    clamped = min(max(bmi, GAUGE_MIN_BMI), GAUGE_MAX_BMI)
+    fraction = (clamped - GAUGE_MIN_BMI) / (GAUGE_MAX_BMI - GAUGE_MIN_BMI)
+    return round(-90 + 180 * fraction, 1)
+
+
 def parse_positive_number(value):
     try:
         number = float(value)
@@ -68,7 +79,11 @@ def index():
                     errors["weight"] = "無法使用這組數值計算 BMI，請檢查身高與體重。"
                 else:
                     displayed_bmi = round(bmi, 1)
-                    result = {"bmi": f"{displayed_bmi:.1f}", **bmi_guidance(displayed_bmi)}
+                    result = {
+                        "bmi": f"{displayed_bmi:.1f}",
+                        "gauge_angle": gauge_angle(displayed_bmi),
+                        **bmi_guidance(displayed_bmi),
+                    }
 
     return render_template(
         "index.html",

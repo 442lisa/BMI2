@@ -57,8 +57,17 @@ button span { font-size: 20px; font-weight: 400; }
 .result-panel.low { background: #e9eef1; }
 .result-panel.high { background: #f5eddf; }
 .panel-kicker { position: relative; z-index: 1; color: #5f816d; }
-.result-main { position: relative; z-index: 1; display: flex; align-items: baseline; gap: 12px; margin-top: 35px; }
-.result-number { font-size: clamp(70px, 8vw, 110px); font-weight: 700; line-height: 1.1; letter-spacing: -.085em; }
+.gauge { position: relative; z-index: 1; margin: 22px 0 0; }
+.gauge svg { display: block; width: min(100%, 320px); margin: 0 auto; overflow: visible; }
+.gauge-seg { fill: none; stroke-width: 16; stroke-linecap: butt; }
+.seg-low { stroke: #a2b8ca; }.seg-healthy { stroke: #85b487; }.seg-high { stroke: #e1c37d; }.seg-obese { stroke: #ca977d; }
+.gauge-tick { fill: #728a77; font-size: 9px; font-weight: 700; text-anchor: middle; }
+.gauge-needle { fill: #24352f; transform-origin: 100px 100px; transform-box: view-box; animation: needle-sweep .9s cubic-bezier(.25, .9, .35, 1.1) both; }
+.gauge-hub { fill: #24352f; stroke: #fff; stroke-width: 3; }
+@keyframes needle-sweep { from { transform: rotate(-90deg); } }
+@media (prefers-reduced-motion: reduce) { .gauge-needle { animation: none; } }
+.result-main { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin: 8px 0 0; }
+.result-number { font-size: clamp(44px, 5vw, 64px); font-weight: 700; line-height: 1.1; letter-spacing: -.07em; }
 .result-unit { color: #728a77; font-size: 13px; font-weight: 700; letter-spacing: .1em; }
 .result-divider { position: relative; z-index: 1; height: 1px; margin: 22px 0 25px; background: #b6cfb5; }
 .result-label { position: relative; z-index: 1; color: #5c735e; font-size: 14px; }
