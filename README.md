@@ -38,3 +38,9 @@ BMI = 體重（公斤）÷ 身高（公尺）²。分類採臺灣成人體位參
 - Repository secret `AZURE_CREDENTIALS`：Azure 服務主體的 `clientId`、`clientSecret`、`subscriptionId`、`tenantId` 組成的 JSON。此 Secret 已設定，不要把內容寫進程式碼。
 
 請確認該服務主體對 `NTUSTweb00` 具有部署權限（例如該站點的 **Website Contributor**）。推送符合上述條件的 `main` 分支異動，或從 GitHub Actions 手動執行工作流程即可部署。
+
+### dev 分支部署到 test slot
+
+`.github/workflows/deploy-azure-test2.yml` 在 `dev` 分支每次 push 時執行，也支援手動觸發。流程沿用正式環境的測試與打包步驟，但只部署到 `test` slot，不會部署到 production slot。
+
+此流程使用 Repository variables `AZURE_WEBAPP_NAME`、`AZURE_RESOURCE_GROUP` 與既有的 Secret `AZURE_CREDENTIALS`。請先在目標 Web App 建立名為 `test` 的 deployment slot，並確認服務主體具有該 slot 的部署權限。此流程與 `deploy-azure-test.yml` 共用 `azure-bmi-test` 併發群組，避免同時部署到同一個 slot。
