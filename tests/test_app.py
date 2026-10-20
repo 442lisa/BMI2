@@ -13,6 +13,10 @@ class BmiAppTests(unittest.TestCase):
         page = response.get_data(as_text=True)
         self.assertIn("了解自己的<br><em>健康狀況。</em>", page)
         self.assertIn("計算你的 BMI", page)
+        self.assertIn('label for="name"', page)
+        self.assertIn('name="name" type="text" autocomplete="name"', page)
+        self.assertIn('value=""', page)
+        self.assertNotIn('class="result-name"', page)
 
     def test_calculation_and_advice(self):
         response = self.client.post("/", data={"height": "170", "weight": "65"})
@@ -20,6 +24,53 @@ class BmiAppTests(unittest.TestCase):
         self.assertIn("22.5", page)
         self.assertIn("健康體位", page)
         self.assertIn("維持均衡飲食", page)
+        self.assertNotIn('class="result-name"', page)
+
+    def test_calculation_with_name(self):
+        response = self.client.post(
+            "/", data={"name": "  王小明  ", "height": "170", "weight": "65"}
+        )
+        page = response.get_data(as_text=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('value="王小明"', page)
+        self.assertIn('class="result-name">王小明，你的 BMI 計算結果</p>', page)
+        self.assertIn("22.5", page)
+
+    def test_blank_name_is_optional(self):
+        for name in ["", "   "]:
+            with self.subTest(name=name):
+                response = self.client.post(
+                    "/", data={"name": name, "height": "170", "weight": "65"}
+                )
+                page = response.get_data(as_text=True)
+                self.assertIn("YOUR RESULT", page)
+                self.assertIn("22.5", page)
+                self.assertNotIn('class="result-name"', page)
+
+    def test_name_is_preserved_after_invalid_calculation(self):
+        response = self.client.post(
+            "/", data={"name": "王小明", "height": "", "weight": "65"}
+        )
+        page = response.get_data(as_text=True)
+        self.assertIn('value="王小明"', page)
+        self.assertIn('id="height-error"', page)
+        self.assertNotIn("YOUR RESULT", page)
+
+    def test_name_is_escaped(self):
+        response = self.client.post(
+            "/",
+            data={
+                "name": '"><script>alert(1)</script>',
+                "height": "170",
+                "weight": "65",
+            },
+        )
+        page = response.get_data(as_text=True)
+        self.assertNotIn("<script>", page)
+        escaped_name = "&#34;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"
+        self.assertIn(f'value="{escaped_name}"', page)
+        self.assertIn(f'{escaped_name}，你的 BMI 計算結果</p>', page)
+        self.assertIn("22.5", page)
 
     def test_taiwan_adult_thresholds(self):
         for bmi, category in [

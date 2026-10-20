@@ -35,6 +35,12 @@
 
               <form method="post" action="{{ url_for('index') }}" novalidate>
                 <div class="form-fields">
+                  <div class="field name-field">
+                    <label for="name">姓名（選填） <span>NAME</span></label>
+                    <div class="input-wrap">
+                      <input id="name" name="name" type="text" autocomplete="name" placeholder="請輸入姓名" value="{{ name_input }}">
+                    </div>
+                  </div>
                   <div class="field">
                     <label for="height">身高 <span>HEIGHT</span></label>
                     <div class="input-wrap">
@@ -61,6 +67,7 @@
             {% if result %}
               <section class="result-panel {{ result.tone }}" aria-labelledby="result-title" aria-live="polite">
                 <span class="panel-kicker">YOUR RESULT / 計算結果</span>
+                {% if name_input %}<p class="result-name">{{ name_input }}，你的 BMI 計算結果</p>{% endif %}
                 <figure class="gauge" role="img" aria-label="BMI 儀表板，你的 BMI 為 {{ result.bmi }}，屬於{{ result.label }}">
                   <svg viewBox="0 0 200 112" aria-hidden="true">
                     <path class="gauge-seg seg-low" d="M 20 100 A 80 80 0 0 1 49.65 37.83"/>
